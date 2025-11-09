@@ -21,8 +21,8 @@ public final class RealName {
 
     static {
         try (InputStream is = RealName.class.getClassLoader().getResourceAsStream("bad_words.txt");
-                BufferedReader reader =
-                        new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
+             BufferedReader reader =
+                     new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
             while (reader.readLine() != null) {
                 invalidWords.addAll(reader.lines().collect(Collectors.toSet()));
             }
@@ -35,16 +35,16 @@ public final class RealName {
 
     /**
      * Validates if the given name is a valid and proper name.
-     * 
+     *
      * @param name the name to check
      * @return true if valid, false if not
-     * 
+     *
      */
     public static boolean validate(String name) {
         String cleanName = Utils.cleanAndUnLeet(name);
         String[] words = cleanName.split("\\W+");
-        for (int i = 1; i < words.length; i++) {
-            if (invalidWords.contains(words[i])) {
+        for (String word : words) {
+            if (invalidWords.contains(word.toLowerCase())) {
                 return false;
             }
         }
