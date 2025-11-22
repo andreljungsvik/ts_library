@@ -58,14 +58,8 @@ public class UserDao {
         return Optional.empty();
     }
 
-    public boolean register(String name, String realname, String password) {
-        Argon2PasswordEncoder encoder = new Argon2PasswordEncoder();
-        String passwordHash = encoder.encode(password);
-
-        // handle names like Ian O'Toole
-        realname = realname.replace("'", "\\'");
-
-        try (Connection conn = ds.getConnection()) {
+    public boolean register(String name, String realname, String passwordHash) {
+       try (Connection conn = ds.getConnection()) {
             conn.setAutoCommit(false);
 
             return insertUserAndRole(name, realname, passwordHash, conn);
