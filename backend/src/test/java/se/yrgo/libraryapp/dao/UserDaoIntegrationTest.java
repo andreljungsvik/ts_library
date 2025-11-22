@@ -27,7 +27,7 @@ public class UserDaoIntegrationTest {
     }
 
     @Test
-    void getUserById() {
+    void get_existingUser_returnsUser() {
 // this data comes from the test migration files
         final String username = "test";
         final UserId userId = UserId.of(1);
@@ -36,5 +36,42 @@ public class UserDaoIntegrationTest {
         assertThat(maybeUser).isPresent();
         assertThat(maybeUser.get().getName()).isEqualTo(username);
         assertThat(maybeUser.get().getId()).isEqualTo(userId);
+    }
+
+    @Test
+    void get_nonExistingUser_returnsEmpty() {
+        final String username = "test";
+        final UserId userId = UserId.of(4);
+        UserDao userDao = new UserDao(ds);
+        Optional<User> maybeUser = userDao.get(Integer.toString(userId.getId()));
+        assertThat(maybeUser).isEmpty();
+    }
+
+    @Test
+    void isNameAvailable_existingName_returnsFalse() {
+        UserDao dao = new UserDao(ds);
+        assertThat(dao.isNameAvailable("test")).isFalse();
+    }
+
+    @Test
+    void isNameAvailable_newName_returnsTrue() {
+        UserDao dao = new UserDao(ds);
+        assertThat(dao.isNameAvailable("bossetheman")).isTrue();
+    }
+
+    @Test
+    void register_newUser_andGetLoginInfo_returnsCorrectUser() {
+        UserDao dao = new UserDao(ds);
+        String username = "bossetheman";
+        String realname = "Bosse Bredsladd";
+        String password = "abcde12345";
+
+        boolean registered = dao.register(username, realname, password);
+        assertThat(registered).isTrue();
+
+        Optional<User> userOpt = dao.getLoginInfo(username).flatMap(info -> dao.get(Integer.toString(info.getUserId().getId())));
+        assertThat(userOpt).isPresent();
+        assertThat(userOpt.get().getName()).isEqualTo(username);
+        assertThat(userOpt.get().getRealname()).isEqualTo(realname);
     }
 }
